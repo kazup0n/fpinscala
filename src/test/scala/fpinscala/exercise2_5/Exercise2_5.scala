@@ -9,9 +9,9 @@ class Exercise2_5 extends FunSuite {
 
     assert(
       compose(
-      (str:String) => "** " + str + " **",
-      (name:String) => "Hello, " + name)("World")
-      === "** Hello, World **")
+        (str: String) => "** " + str + " **",
+        (name: String) => "Hello, " + name)("World")
+        === "** Hello, World **")
 
   }
 

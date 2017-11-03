@@ -21,12 +21,12 @@ class FibTest extends FunSuite {
   }
 
   test("fib(n)") {
-    Seq(0,1,1,2,3,5,8,13).zipWithIndex.foreach(_ match {
-      case (n:Int,i:Int)=> assert(fib(i+1) == n)
+    Seq(0, 1, 1, 2, 3, 5, 8, 13).zipWithIndex.foreach(_ match {
+      case (n: Int, i: Int) => assert(fib(i + 1) == n)
     })
   }
 
-  test("fib(35) = 5702887"){
+  test("fib(35) = 5702887") {
     assert(fib(35) == 5702887)
   }
 

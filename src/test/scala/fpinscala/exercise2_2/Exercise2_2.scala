@@ -6,8 +6,9 @@ import scala.util.Random
 
 class Exercise2_2 extends FunSuite {
 
-  def sortInt(a:Int, b:Int):Boolean = b > a
-  def sortString(a:String, b:String):Boolean = b > a
+  def sortInt(a: Int, b: Int): Boolean = b > a
+
+  def sortString(a: String, b: String): Boolean = b > a
 
 
   test("sorted number") {
@@ -18,16 +19,16 @@ class Exercise2_2 extends FunSuite {
     assert(isSorted(Array(1, 3, 2, 4, 5), sortInt) == false)
   }
 
-  test("Shuffled array"){
+  test("Shuffled array") {
     val random = Random.shuffle(Range(0, 500, 2).toList).toArray
     assert(isSorted(random, sortInt) == false)
   }
 
-  test("sorted strings"){
+  test("sorted strings") {
     assert(isSorted(Array("a", "b", "c", "d"), sortString))
   }
 
-  test("unsorted strings"){
+  test("unsorted strings") {
     assert(isSorted(Random.shuffle(Seq("a", "b", "c", "d")).toArray, sortString) == false)
   }
 
