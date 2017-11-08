@@ -21,11 +21,13 @@ object List {
     case Cons(h, t) => Cons(h, append(t, a2))
   }
 
+  def append2[A](a1: List[A], a2: List[A]): List[A] = foldLeft(reverse(a1),a2)((a, as)=>Cons(a, as))
+
 
   @tailrec
-  def dropWhile[A](list: List[A], f: A => Boolean): List[A] = list match {
+  def dropWhile[A](list: List[A])(f: A => Boolean): List[A] = list match {
     case Nil => Nil
-    case Cons(x: A, xs: List[A]) => if (f(x)) dropWhile(xs, f) else list
+    case Cons(x: A, xs: List[A]) => if (f(x)) dropWhile(xs)(f) else list
   }
 
 
@@ -43,11 +45,27 @@ object List {
     case Cons(_, rest) => Cons(head, rest)
   }
 
+  def tail[A](xs: List[A]): List[A] = xs match {
+    case Nil => Nil
+    case Cons(_, rest: List[A]) => rest
+  }
+
+  def foldRight[A, B](as: List[A], z: B)(f: (A, B) => B): B = foldLeft(reverse(as), z)(f)
+
+  @tailrec
+  def foldLeft[A, B](as: List[A], z: B)(f: (A, B) => B): B = as match {
+    case Nil => z
+    case Cons(x: A, xs: List[A]) => foldLeft(xs, f(x, z))(f)
+  }
+
   @tailrec
   def sum(ints: List[Int], _sum: Int = 0): Int = ints match {
     case Nil => _sum
     case Cons(x: Int, xs: List[Int]) => sum(xs, x + _sum)
   }
+
+  def sum2(ns: List[Int]): Int = foldRight(ns, 0)(_ + _)
+  def sum3(ns: List[Int]): Int = foldLeft(ns, 0)(_ + _)
 
   @tailrec
   def product(ds: List[Double], _product: Double): Double = ds match {
@@ -55,12 +73,26 @@ object List {
     case Cons(0.0, _) => 0
     case Cons(x: Double, xs: List[Double]) => product(xs, x * _product)
   }
+  def product2(ns: List[Double]): Double = foldRight(ns, 1.0)(_ * _)
+  def product3(ns: List[Double]): Double = foldLeft(ns, 1.0)(_ * _)
 
-  def tail[A](xs: List[A]): List[A] = xs match {
-    case Nil => Nil
-    case Cons(_, rest: List[A]) => rest
-  }
 
+  def length[A](as: List[A]): Int = foldRight(as, 0)((_, c) => c + 1)
+  def length2[A](as: List[A]): Int = foldLeft(as, 0)((_, c) => c + 1)
+
+  def reverse[A](as: List[A]):List[A] = foldLeft(as, List())((x:A,xs:List[A]) => Cons(x, xs))
+
+  def flatten[A](as: List[List[A]]): List[A] = reverse(foldLeft(as, List())((x, xs)=>foldLeft(x, xs)((y, ys)=>(Cons(y, ys)))))
+
+
+  def map[A, B](as: List[A])(f: A=>B):List[B] = foldRight(as, List())((x, xs)=>Cons(f(x), xs))
+  def flatMap[A, B](as: List[A])(f: A=>List[B]):List[B] = flatten(foldRight(as, List())((x, xs)=>Cons(f(x), xs)))
+
+  def filter[A](as: List[A])(f: A=>Boolean):List[A] = foldRight(as, List())((x,xs) => if(f(x)) Cons(x, xs) else xs)
+  def filter2[A](as: List[A])(f: A=>Boolean):List[A] = flatMap(as)(x => if(f(x)) List(x) else Nil)
+
+  def addOne(as: List[Int]):List[Int] = map(as)(_+1)
+  def doubleToString(as: List[Double]) = map(as)(_.toString)
 
   def apply[A](as: A*): List[A] =
     if (as.isEmpty) Nil
