@@ -2,7 +2,7 @@ package fpinscala.exercise3
 
 import org.scalatest.FunSuite
 
-class Exercise3 extends FunSuite {
+class Exercise3List extends FunSuite {
 
   test("exercise 3.1 - test match") {
     val x = List(1, 2, 3, 4, 5) match {
