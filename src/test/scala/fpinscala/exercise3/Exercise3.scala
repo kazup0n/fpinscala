@@ -69,7 +69,7 @@ class Exercise3 extends FunSuite {
     assert(List.flatten(listOfList) == List(1, 2, 3, 4, 5, 6, 7, 8, 9))
   }
 
-  test("exercise 3.16 - addOne"){
+ test("exercise 3.16 - addOne"){
     assert(List.addOne(List(1, 2, 3)) == List(2, 3, 4))
   }
 
@@ -93,5 +93,23 @@ class Exercise3 extends FunSuite {
     assert(List.filter2(List(1, 2, 3, 4, 5, 6))(_%2==0) == List(2, 4, 6))
   }
 
+  test("exercise 3.22 - zip"){
+    assert(List.zip(List(1, 2, 3), List(4, 5, 6)) === List(5, 7, 9))
+  }
+
+  test("exercise 3.23 - zipWith"){
+    assert(List.zipWith(List(1, 2, 3), List(4, 5, 6))(_+_) === List(5, 7, 9))
+  }
+
+  test("exercise 3.24 - hasSubSequence") {
+    assert(List.hasSubSequence(List(1, 2, 3, 4, 5, 6), List(3, 4, 5)) === true)
+    assert(List.hasSubSequence(List(1, 2, 3, 4, 5, 6), List(1, 2, 3)) === true)
+    assert(List.hasSubSequence(List(1, 2, 3, 4, 5, 6), List(6)) === true)
+    assert(List.hasSubSequence(List(1, 2, 3, 4, 5, 6), Nil) === true)
+
+    assert(List.hasSubSequence(List(1, 2, 3, 4, 5, 6), List(3, 5, 6)) === false)
+    assert(List.hasSubSequence(List(1), List(3, 5, 6)) === false)
+    assert(List.hasSubSequence(Nil, List(3, 5, 6)) === false)
+  }
 
 }

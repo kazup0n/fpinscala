@@ -10,6 +10,7 @@ case class Cons[+A](head: A, tail: List[A]) extends List
 
 object List {
 
+
   def init[A](list: List[A]): List[A] = list match {
     case Nil => Nil
     case Cons(x: A, Cons(_: A, Nil)) => List(x)
@@ -93,6 +94,43 @@ object List {
 
   def addOne(as: List[Int]):List[Int] = map(as)(_+1)
   def doubleToString(as: List[Double]) = map(as)(_.toString)
+
+
+  def zip(xs: List[Int], ys: List[Int]):List[Int]= (xs, ys) match {
+    case (Cons(x:Int, _xs:List[Int]), Cons(y:Int, _ys:List[Int])) => Cons(x+y, zip(_xs, _ys))
+    case (Nil, _) => Nil
+    case (_, Nil) => Nil
+  }
+
+  def zipWith[A, B](xs: List[A], ys: List[A])(f: (A, A) => B):List[B] = (xs, ys) match {
+    case (Cons(x:A, _xs:List[A]), Cons(y:A, _ys:List[A])) => Cons(f(x, y), zipWith(_xs, _ys)(f))
+    case (Nil, _) => Nil
+    case (_, Nil) => Nil
+  }
+
+  def hasSubSequence[A](haystack: List[A], needle: List[A]):Boolean = {
+
+    @tailrec
+    def go(_haystack: List[A], _needle: List[A]):Boolean = (_haystack, _needle) match {
+      case (Cons(x:A, _xs:List[A]), Cons(y:A, _ys:List[A])) => x==y && go(_xs, _ys)
+      case (Nil, _) => true
+      case _ => true
+    }
+
+    @tailrec
+    def withTail(xs:List[A])(f: List[A]=>Boolean):Boolean = xs match {
+      case Cons(_, tail:List[A]) => f(xs) || withTail(tail)(f)
+      case Cons(_, Nil) => f(xs)
+      case Nil => false
+    }
+
+    (haystack, needle) match {
+      case (Nil, _) => false
+      case (_, Nil) => true
+      case _ => withTail(haystack)(go(_, needle))
+    }
+
+  }
 
   def apply[A](as: A*): List[A] =
     if (as.isEmpty) Nil
