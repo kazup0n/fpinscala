@@ -81,6 +81,24 @@ class Exercise3Tree extends FunSuite {
       == 0)
 
     assert(Tree.depth(Leaf(1), Leaf(1)) == 1)
+
+    //検索条件なし
+    assert(Tree.depth(
+      Branch(
+        Branch(
+          Leaf(1),
+          Leaf(2)
+        ),
+        Branch(
+          Leaf(4),
+          Branch(
+            Leaf(1),
+            Leaf(4)
+          )
+        )
+      ))
+      == 4)
+
   }
 
   test("exercise 3.28 - map") {

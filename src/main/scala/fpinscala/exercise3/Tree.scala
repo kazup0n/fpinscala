@@ -16,10 +16,16 @@ object Tree {
   def depth[A](t: Tree[A], search: Leaf[A]): Int = t match {
     case l: Leaf[A] => if (l == search) 1 else 0
     case Branch(left, right) => {
-      val n = (depth(left, search) max depth(right, search))
+      val n = depth(left, search) max depth(right, search) max 0
       if (n > 0) n + 1 else 0
     }
   }
+
+  def depth[A](t: Tree[A]):Int = t match {
+    case Leaf(_) => 1
+    case Branch(l, r) => (depth(l) max depth(r)) + 1
+  }
+
 
 
   def max(t: Tree[Int]): Int = t match {
