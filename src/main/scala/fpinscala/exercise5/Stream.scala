@@ -5,42 +5,44 @@ import scala.annotation.tailrec
 trait Stream[+A] {
 
 
-  def drop(n: Int):Stream[A] = {
+  def drop(n: Int): Stream[A] = {
     @tailrec
-    def go(s: Stream[A], c:Int): Stream[A] = s match {
-      case Cons(_, t) if c > 0 => go(t(), c-1)
+    def go(s: Stream[A], c: Int): Stream[A] = s match {
+      case Cons(_, t) if c > 0 => go(t(), c - 1)
       case _ => s
     }
+
     go(this, n)
   }
 
 
-  def takeWhile(p: A=>Boolean): Stream[A] = this match {
-    case Cons(h, t) if(p(h())) => Stream.cons(h(), t().takeWhile(p))
+  def takeWhile(p: A => Boolean): Stream[A] = this match {
+    case Cons(h, t) if (p(h())) => Stream.cons(h(), t().takeWhile(p))
     case _ => Empty
   }
 
-  def take(n:Int): List[A] = {
+  def take(n: Int): List[A] = {
     @tailrec
-    def go(s:Stream[A], c:Int, acc:List[A]):List[A] = s match {
-      case Cons(h, t) if c > 0 => go(t(), c-1, h()::acc)
+    def go(s: Stream[A], c: Int, acc: List[A]): List[A] = s match {
+      case Cons(h, t) if c > 0 => go(t(), c - 1, h() :: acc)
       case _ => acc
     }
+
     go(this, n, List()).reverse
   }
 
 
-
-  def toListResursive:List[A] = this match {
+  def toListResursive: List[A] = this match {
     case Empty => List()
-    case Cons(h, t) => h()::t().toListResursive
+    case Cons(h, t) => h() :: t().toListResursive
   }
 
-  def toList:List[A] = {
-    def go(s: Stream[A], acc:List[A]):List[A] = s match {
-      case Cons(h, t) => go(t(), h()::acc)
+  def toList: List[A] = {
+    def go(s: Stream[A], acc: List[A]): List[A] = s match {
+      case Cons(h, t) => go(t(), h() :: acc)
       case _ => acc
     }
+
     go(this, List()).reverse
   }
 }

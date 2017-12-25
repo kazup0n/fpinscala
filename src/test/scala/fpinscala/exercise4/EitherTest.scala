@@ -101,7 +101,7 @@ class EitherTest extends FunSuite {
     }
   }
 
-  test("exercise 4.8 with Partial"){
+  test("exercise 4.8 with Partial") {
 
     case class Person(name: Name, age: Age)
     sealed class Name(val value: String)

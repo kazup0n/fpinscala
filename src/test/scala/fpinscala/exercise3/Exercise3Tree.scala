@@ -106,23 +106,23 @@ class Exercise3Tree extends FunSuite {
     assert(Tree.map(Branch(Leaf(1), Branch(Leaf(2), Leaf(3))))(_ + 1) == Branch(Leaf(2), Branch(Leaf(3), Leaf(4))))
   }
 
-  test("exercise 3.29 - fold"){
-    val t:Tree[Int] = Branch(Leaf(1), Branch(Leaf(2), Leaf(3)))
+  test("exercise 3.29 - fold") {
+    val t: Tree[Int] = Branch(Leaf(1), Branch(Leaf(2), Leaf(3)))
     //max
-    assert(Tree.fold(t)(v=>v)(_ max _) == 3)
+    assert(Tree.fold(t)(v => v)(_ max _) == 3)
 
     //size
     assert(
-      Tree.fold(t)(_=>1)((l:Int, r:Int)=> l+r+1)
-      ==
-      5
+      Tree.fold(t)(_ => 1)((l: Int, r: Int) => l + r + 1)
+        ==
+        5
     )
 
     //depth
-    def depth[A](_t: Tree[A], s:Leaf[A]): Int =
-      Tree.fold(_t)(v => if(s.value==v) 1 else 0)((l, r)=> {
+    def depth[A](_t: Tree[A], s: Leaf[A]): Int =
+      Tree.fold(_t)(v => if (s.value == v) 1 else 0)((l, r) => {
         val d = l max r
-        if(d > 0) d+1 else 0
+        if (d > 0) d + 1 else 0
       })
 
     assert(depth(Leaf(1), Leaf(1)) == 1)
@@ -130,13 +130,11 @@ class Exercise3Tree extends FunSuite {
 
 
     //map
-    def map[A, B](_t:Tree[A])(f: A=>B): Tree[B] = Tree.fold(_t)(v=>Leaf(f(v)):Tree[B])((l, r)=> Branch(l, r))
-    assert(map(t)(_+1) == Branch(Leaf(2), Branch(Leaf(3), Leaf(4))))
+    def map[A, B](_t: Tree[A])(f: A => B): Tree[B] = Tree.fold(_t)(v => Leaf(f(v)): Tree[B])((l, r) => Branch(l, r))
+
+    assert(map(t)(_ + 1) == Branch(Leaf(2), Branch(Leaf(3), Leaf(4))))
 
   }
-
-
-
 
 
 }

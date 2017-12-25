@@ -50,55 +50,55 @@ class Exercise3List extends FunSuite {
     assert(List.length(List(1, 2, 3, 4, 5)) == 5)
   }
 
-  test("exercise 3.11 - sum, product, length with foldLeft"){
+  test("exercise 3.11 - sum, product, length with foldLeft") {
     assert(List.sum3(List(1, 2, 3)) == 6)
     assert(List.product3(List(1, 2, 3)) == 6.0)
     assert(List.length2(List(1, 2, 3)) == 3)
   }
 
-  test("exercise 3.12 - reverse"){
+  test("exercise 3.12 - reverse") {
     assert(List.reverse(List(1, 2, 3)) == List(3, 2, 1))
   }
 
-  test("exercise 3.13 - append"){
+  test("exercise 3.13 - append") {
     assert(List.append2(List(1, 2, 3), List(4, 5, 6)) == List(1, 2, 3, 4, 5, 6))
   }
 
-  test("exercise 3.15 - flatten"){
+  test("exercise 3.15 - flatten") {
     val listOfList = List(List(1, 2, 3), List(4, 5, 6), List(7, 8, 9))
     assert(List.flatten(listOfList) == List(1, 2, 3, 4, 5, 6, 7, 8, 9))
   }
 
- test("exercise 3.16 - addOne"){
+  test("exercise 3.16 - addOne") {
     assert(List.addOne(List(1, 2, 3)) == List(2, 3, 4))
   }
 
-  test("exercise 3.17 - toString"){
+  test("exercise 3.17 - toString") {
     assert(List.doubleToString(List(1.0, 2.0, 3.0)) == List("1.0", "2.0", "3.0"))
   }
 
-  test("exercise 3.18 - map"){
-    assert(List.map(List(1.0, 2.0, 3.0))(x=>x.toString) == List("1.0", "2.0", "3.0"))
+  test("exercise 3.18 - map") {
+    assert(List.map(List(1.0, 2.0, 3.0))(x => x.toString) == List("1.0", "2.0", "3.0"))
   }
 
-  test("exercise 3.19 - filter"){
-    assert(List.filter(List(1, 2, 3, 4, 5, 6))(_%2==0) == List(2, 4, 6))
+  test("exercise 3.19 - filter") {
+    assert(List.filter(List(1, 2, 3, 4, 5, 6))(_ % 2 == 0) == List(2, 4, 6))
   }
 
-  test("exercise 3.20 - flatMap"){
-    assert(List.flatMap(List(1, 2, 3))(i=>List(i,i)) == List(1,1,2,2,3,3))
+  test("exercise 3.20 - flatMap") {
+    assert(List.flatMap(List(1, 2, 3))(i => List(i, i)) == List(1, 1, 2, 2, 3, 3))
   }
 
-  test("exercise 3.21 - filter2"){
-    assert(List.filter2(List(1, 2, 3, 4, 5, 6))(_%2==0) == List(2, 4, 6))
+  test("exercise 3.21 - filter2") {
+    assert(List.filter2(List(1, 2, 3, 4, 5, 6))(_ % 2 == 0) == List(2, 4, 6))
   }
 
-  test("exercise 3.22 - zip"){
+  test("exercise 3.22 - zip") {
     assert(List.zip(List(1, 2, 3), List(4, 5, 6)) === List(5, 7, 9))
   }
 
-  test("exercise 3.23 - zipWith"){
-    assert(List.zipWith(List(1, 2, 3), List(4, 5, 6))(_+_) === List(5, 7, 9))
+  test("exercise 3.23 - zipWith") {
+    assert(List.zipWith(List(1, 2, 3), List(4, 5, 6))(_ + _) === List(5, 7, 9))
   }
 
   test("exercise 3.24 - hasSubSequence") {
