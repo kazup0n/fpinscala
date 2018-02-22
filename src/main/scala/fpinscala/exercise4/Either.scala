@@ -34,9 +34,11 @@ object Either {
       case e: Exception => Left(e)
     }
 
+  //TODO foldRightで実装する(パフォーマンスがいい)
   def sequence[E, A](es: List[Either[E, A]]): Either[E, List[A]] =
     es.foldLeft(successful[E, List[A]](List()))((z, e) => z flatMap (zz => e map (zz :+ _)))
 
+  //TODO foldRightで実装する(パフォーマンスがいい)
   def traverse[E, A, B](as: List[A])(f: A => Either[E, B]): Either[E, List[B]] =
     as.foldLeft(successful[E, List[B]](List()))((z, a) => z flatMap (zz => f(a) map (b => zz :+ b)))
 
