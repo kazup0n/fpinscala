@@ -21,6 +21,8 @@ trait Stream[+A] {
     case _ => Empty
   }
 
+  def takeWhileWithFoldRight(p: A => Boolean): Stream[A] = foldRight(Stream.empty:Stream[A])((a,z) => if(p(a)) Stream.cons(a, z) else Stream.empty)
+
   def take(n: Int): List[A] = {
     @tailrec
     def go(s: Stream[A], c: Int, acc: List[A]): List[A] = s match {
@@ -38,6 +40,7 @@ trait Stream[+A] {
   }
 
   def toList: List[A] = {
+    @tailrec
     def go(s: Stream[A], acc: List[A]): List[A] = s match {
       case Cons(h, t) => go(t(), h() :: acc)
       case _ => acc
@@ -87,7 +90,7 @@ object Stream {
     Cons(() => head, () => tail)
   }
 
-  //  def append2[A](a1: List[A], a2: List[A]): List[A] = foldLeft(reverse(a1), a2)((a, as) => Cons(a, as))
+  // def append2[A](a1: List[A], a2: List[A]): List[A] = foldLeft(reverse(a1), a2)((a, as) => Cons(a, as))
   def append[A](as: Stream[A], bs: Stream[A]): Stream[A] = as.foldRight(bs)((a, memo) => cons(a, memo))
 
   def empty[A]: Stream[A] = Empty
@@ -96,5 +99,15 @@ object Stream {
     if (as.isEmpty) empty
     else cons(as.head, apply(as.tail: _*))
 
+  val ones: Stream[Int] = cons(1, ones)
+
+  def constant[A](a: A):Stream[A] = cons(a, constant(a))
+
+  def from(n:Int):Stream[Int] = cons(n, from(n+1))
+
+  def fibs:Stream[Int] = {
+    def go(a:Int, b:Int):Stream[Int] = Stream.cons(a, Stream.cons(b, go(a+b, a+b+b)))
+    go(0, 1)
+  }
 
 }
