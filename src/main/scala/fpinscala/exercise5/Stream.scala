@@ -76,6 +76,17 @@ trait Stream[+A] {
     f(a).foldRight(bs)((b, memo) => Stream.cons(b, memo))
   }
 
+
+
+  def tails:Stream[Stream[A]] = Stream.cons(this, Stream.unfold(this){
+    // A:Stream[A] => Option[(A, Stream[Stream[A]])]
+    case Cons(_, tail) => Some((tail(), tail()))
+    case Empty => None
+  })
+
+  def scanRight[B](z: B)(f: (A, => B) => B): Stream[B] = foldRight(Stream(z)) { (a, memo) =>
+    Stream.cons(f(a, memo.headOption.getOrElse(z)), memo)
+  }
 }
 
 case object Empty extends Stream[Nothing]
@@ -103,11 +114,22 @@ object Stream {
 
   def constant[A](a: A):Stream[A] = cons(a, constant(a))
 
+  def unfoldOnes = unfoldConstant(1)
+  def unfoldConstant[A](a: A):Stream[A] = unfold(a) (s => Some(s, s))
+  def unfoldFrom(n:Int):Stream[Int] = unfold(n) {  s=> Some((s, s+1)) }
+
   def from(n:Int):Stream[Int] = cons(n, from(n+1))
 
   def fibs:Stream[Int] = {
     def go(a:Int, b:Int):Stream[Int] = Stream.cons(a, Stream.cons(b, go(a+b, a+b+b)))
     go(0, 1)
   }
+
+  def unfold[A, S](z: S)(f: S => Option[(A, S)]): Stream[A] = f(z) match {
+    case Some((a, s)) => Stream.cons(a, unfold(s)(f))
+    case _ => Stream.empty
+  }
+
+
 
 }
