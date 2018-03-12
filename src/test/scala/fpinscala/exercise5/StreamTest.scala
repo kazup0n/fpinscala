@@ -68,22 +68,22 @@ class StreamTest extends FunSuite {
   }
 
   test("exercise 5.8 constant") {
-    assert(Stream.constant("🐈").take(5).toList == List("🐈", "🐈", "🐈", "🐈", "🐈"))
-    assert(Stream.constant("🐟").map(_ => "🍣").take(5).toList == List("🍣", "🍣", "🍣", "🍣", "🍣"))
+    assert(Stream.constant("🐈").take(5) == List("🐈", "🐈", "🐈", "🐈", "🐈"))
+    assert(Stream.constant("🐟").map(_ => "🍣").take(5) == List("🍣", "🍣", "🍣", "🍣", "🍣"))
   }
 
   test("exercise 5.9 from") {
-    assert(Stream.from(0).take(5).toList == List(0, 1, 3, 2, 4))
+    assert(Stream.from(0).take(5) == List(0, 1, 2, 3, 4))
   }
 
   test("exercise 5.10 fibs") {
-    assert(Stream.fibs.take(10).toList == List(0, 1, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89, 144, 233, 377, 610, 987, 1597, 2584, 4181, 6765, 10946).take(10))
+    assert(Stream.fibs.take(10) == List(0, 1, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89, 144, 233, 377, 610, 987, 1597, 2584, 4181, 6765, 10946).take(10))
   }
 
   test("exercise 5.11/5.12 unfold") {
-    assert(Stream.unfoldOnes.take(5).toList === List(1, 1, 1, 1, 1))
-    assert(Stream.unfoldConstant("🐈").take(3).toList === List("🐈", "🐈", "🐈"))
-    assert(Stream.unfoldFrom(5).take(3).toList === List(5, 6, 7))
+    assert(Stream.unfoldOnes.take(5) === List(1, 1, 1, 1, 1))
+    assert(Stream.unfoldConstant("🐈").take(3) === List("🐈", "🐈", "🐈"))
+    assert(Stream.unfoldFrom(5).take(3) === List(5, 6, 7))
   }
 
   test("exercise 5.15 tails") {
