@@ -21,7 +21,7 @@ trait Stream[+A] {
     case _ => Empty
   }
 
-  def takeWhileWithFoldRight(p: A => Boolean): Stream[A] = foldRight(Stream.empty:Stream[A])((a,z) => if(p(a)) Stream.cons(a, z) else Stream.empty)
+  def takeWhileWithFoldRight(p: A => Boolean): Stream[A] = foldRight(Stream.empty: Stream[A])((a, z) => if (p(a)) Stream.cons(a, z) else Stream.empty)
 
   def take(n: Int): List[A] = {
     @tailrec
@@ -77,10 +77,13 @@ trait Stream[+A] {
   }
 
 
-
-  def tails:Stream[Stream[A]] = Stream.cons(this, Stream.unfold(this){
+  def tails: Stream[Stream[A]] = Stream.cons(this, Stream.unfold(this) {
     // A:Stream[A] => Option[(A, Stream[Stream[A]])]
-    case Cons(_, tail) => Some((tail(), tail()))
+    case Cons(_, tail) => {
+      lazy val tailVal = tail()
+      Some((tailVal, tailVal))
+    } //Some([2,3,4], [2,3,4]を使って次の値を作って欲しい)
+    //    case s@Cons(_, tail) => Some(s, tail())
     case Empty => None
   })
 
@@ -112,16 +115,19 @@ object Stream {
 
   val ones: Stream[Int] = cons(1, ones)
 
-  def constant[A](a: A):Stream[A] = cons(a, constant(a))
+  def constant[A](a: A): Stream[A] = cons(a, constant(a))
 
   def unfoldOnes = unfoldConstant(1)
-  def unfoldConstant[A](a: A):Stream[A] = unfold(a) (s => Some(s, s))
-  def unfoldFrom(n:Int):Stream[Int] = unfold(n) {  s=> Some((s, s+1)) }
 
-  def from(n:Int):Stream[Int] = cons(n, from(n+1))
+  def unfoldConstant[A](a: A): Stream[A] = unfold(a)(s => Some(s, s))
 
-  def fibs:Stream[Int] = {
-    def go(a:Int, b:Int):Stream[Int] = Stream.cons(a, Stream.cons(b, go(a+b, a+b+b)))
+  def unfoldFrom(n: Int): Stream[Int] = unfold(n) { s => Some((s, s + 1)) }
+
+  def from(n: Int): Stream[Int] = cons(n, from(n + 1))
+
+  def fibs: Stream[Int] = {
+    def go(a: Int, b: Int): Stream[Int] = Stream.cons(a, Stream.cons(b, go(a + b, a + b + b)))
+
     go(0, 1)
   }
 
@@ -129,7 +135,6 @@ object Stream {
     case Some((a, s)) => Stream.cons(a, unfold(s)(f))
     case _ => Stream.empty
   }
-
 
 
 }

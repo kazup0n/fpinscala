@@ -81,22 +81,22 @@ class StreamTest extends FunSuite {
   }
 
   test("exercise 5.11/5.12 unfold") {
-    assert(Stream.unfoldOnes.take(5).toList === List(1,1,1,1,1))
+    assert(Stream.unfoldOnes.take(5).toList === List(1, 1, 1, 1, 1))
     assert(Stream.unfoldConstant("🐈").take(3).toList === List("🐈", "🐈", "🐈"))
-    assert(Stream.unfoldFrom(5).take(3).toList === List(5,6,7))
+    assert(Stream.unfoldFrom(5).take(3).toList === List(5, 6, 7))
   }
 
   test("exercise 5.15 tails") {
-    val tails = Stream(1,2,3,4).tails.toList
-    assert(tails(0).toList == Stream(1,2,3,4).toList)
-    assert(tails(1).toList == Stream(2,3,4).toList)
-    assert(tails(2).toList == Stream(3,4).toList)
+    val tails = Stream(1, 2, 3, 4).tails.toList
+    assert(tails(0).toList == Stream(1, 2, 3, 4).toList)
+    assert(tails(1).toList == Stream(2, 3, 4).toList)
+    assert(tails(2).toList == Stream(3, 4).toList)
     assert(tails(3).toList == Stream(4).toList)
     assert(tails(4).toList == Stream().toList)
   }
 
   test("exercise 5.16 scanRight") {
-    assert(Stream(1,2,3).scanRight(0)(_+_).toList === List(6,5,3, 0))
+    assert(Stream(1, 2, 3).scanRight(0)(_ + _).toList === List(6, 5, 3, 0))
   }
 
 
