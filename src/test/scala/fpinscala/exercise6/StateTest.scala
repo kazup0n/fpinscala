@@ -104,8 +104,9 @@ class StateTest extends FunSuite {
     }
   }
 
-  test("exercise 6.5 sequence"){
+  test("exercise 6.5 sequence") {
     def ints(count: Int)(rng: RNG): (List[Int], RNG) = RNG.sequence2(List.fill(count)(RNG.int)).apply(rng)
+
     val r1 = ints(10)(SimpleRNG(10))
     val r2 = ints(10)(SimpleRNG(10))
     assert(r1 == r2)
