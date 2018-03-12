@@ -40,8 +40,9 @@ class StateTest extends FunSuite {
     Stream.ones.take(1000).foldRight(SimpleRNG(10)) { (_, acc) =>
       RNG.double(acc) match {
         case (n, nextRng: SimpleRNG) => {
+          println(n)
           assert(n >= 0)
-          assert(n <= 1)
+          assert(n < 1)
           nextRng
         }
       }
@@ -88,6 +89,28 @@ class StateTest extends FunSuite {
     println(RNG.ints(10)(SimpleRNG(10))._1)
     println(RNG.ints(10)(SimpleRNG(10))._1)
     println(RNG.ints(10)(SimpleRNG(10))._1)
+  }
+
+  test("exercise 6.5 doubleWithMap") {
+    Stream.ones.take(1000).foldRight(SimpleRNG(10)) { (_, acc) =>
+      RNG.doubleWithMap(acc) match {
+        case (n, nextRng: SimpleRNG) => {
+          println(n)
+          assert(n >= 0)
+          assert(n < 1)
+          nextRng
+        }
+      }
+    }
+  }
+
+  test("exercise 6.5 sequence"){
+    def ints(count: Int)(rng: RNG): (List[Int], RNG) = RNG.sequence2(List.fill(count)(RNG.int)).apply(rng)
+    val r1 = ints(10)(SimpleRNG(10))
+    val r2 = ints(10)(SimpleRNG(10))
+    assert(r1 == r2)
+    println(r1._1)
+    println(r2._1)
   }
 
 }

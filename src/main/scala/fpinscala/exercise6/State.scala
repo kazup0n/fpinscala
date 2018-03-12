@@ -19,7 +19,52 @@ case class SimpleRNG(seed: Long) extends RNG {
 }
 
 object RNG {
-  def nonNegativeInt(rng: RNG): (Int, RNG) = rng.nextInt match {
+
+  type Rand[+A] = RNG => (A, RNG)
+
+  val int: Rand[Int] = _.nextInt
+  val randIntDouble:Rand[(Int, Double)] = both(int, double)
+  val randDoubleInt:Rand[(Double, Int)] = both(double, int)
+
+   def unit[A](a: A): Rand[A] = rng => (a, rng)
+
+  def map[A, B](s: Rand[A])(f: A => B): Rand[B] = rng => s(rng) match {
+    case (a, rng2) => (f(a), rng2)
+  }
+
+  def map2[A, B, C](ra:Rand[A], rb:Rand[B])(f: (A, B) => C): Rand[C]  = rng => (ra(rng), rb(rng)) match {
+    case ( (a, next), (b, _)) => (f(a, b), next)
+  }
+
+  def both[A, B](ra:Rand[A], rb:Rand[B]):Rand[(A, B)] = map2(ra, rb)((_,_))
+
+  def sequence[A](fs: List[Rand[A]]):Rand[List[A]] = rng => {
+    var remainFs = fs
+    var next = rng
+
+    val as = List.fill(fs.size) {
+      val result = remainFs.head(rng)
+      next = result._2
+      remainFs = remainFs.tail
+      result._1
+    }
+    (as, next)
+  }
+
+  def sequence2[A](fs: List[Rand[A]]):Rand[List[A]] = rng => {
+    @tailrec
+    def go[A](rng: RNG, fs:List[Rand[A]], acc:List[A]):(List[A], RNG) = fs match {
+      case h+:tail => h(rng) match {
+        case (n, next) => go(next, tail, n+:acc)
+      }
+      case _ => (acc, rng)
+    }
+    go(rng, fs, List())
+  }
+
+
+
+    def nonNegativeInt(rng: RNG): (Int, RNG) = rng.nextInt match {
     case (n, r) => {
       val next = if (n.isNegInfinity) 0
       else if (n < 0) 0
@@ -30,9 +75,11 @@ object RNG {
 
   def double(rng: RNG): (Double, RNG) = nonNegativeInt(rng) match {
     case (n, r) => {
-      ((Int.MaxValue - n) / Int.MaxValue, r)
+      (n.toDouble/Int.MaxValue.toDouble, r)
     }
   }
+
+  def doubleWithMap(rng: RNG):(Double, RNG) = map(int)(_.toDouble / Int.MaxValue.toDouble).apply(rng)
 
   def intDouble(rng: RNG): ((Int, Double), RNG) = (nonNegativeInt(rng), double(rng)) match {
     case ((i, next), (d, _)) => {
