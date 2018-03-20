@@ -75,8 +75,9 @@ object RNG {
 
   def double(rng: RNG): (Double, RNG) = nonNegativeInt(rng) match {
     case (n, r) => {
-      (n.toDouble / Int.MaxValue.toDouble, r)
+      (n.toDouble / Math.nextUp(Int.MaxValue.toDouble)), r)
     }
+
   }
 
   def doubleWithMap(rng: RNG): (Double, RNG) = map(nonNegativeInt)(_.toDouble / Int.MaxValue.toDouble).apply(rng)

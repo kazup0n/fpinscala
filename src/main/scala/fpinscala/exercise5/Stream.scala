@@ -87,8 +87,9 @@ trait Stream[+A] {
     case Empty => None
   })
 
-  def scanRight[B](z: B)(f: (A, => B) => B): Stream[B] = foldRight(Stream(z)) { (a, memo) =>
-    Stream.cons(f(a, memo.headOption.getOrElse(z)), memo)
+  def scanRight[B](z: B)(f: (A, => B) => B): Stream[B] = foldRight(Stream(z)) { (a, acc) =>
+    lazy val accMemo = acc
+    Stream.cons(f(a, accMemo.headOption.getOrElse(z)), accMemo)
   }
 }
 
