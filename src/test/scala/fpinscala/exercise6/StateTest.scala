@@ -1,7 +1,9 @@
 package fpinscala.exercise6
 
 import fpinscala.exercise5.Stream
+import fpinscala.exercise6.RNG.Rand
 import org.scalatest.FunSuite
+import org.scalatest.Matchers._
 
 class StateTest extends FunSuite {
 
@@ -104,7 +106,19 @@ class StateTest extends FunSuite {
     }
   }
 
-  test("exercise 6.5 sequence") {
+  test("exercise 6.6 map2") {
+    def randIntDouble: Rand[(Int, Double)] = RNG.both(RNG.int, RNG.double)
+
+    val rng = SimpleRNG(10)
+    (randIntDouble(rng), randIntDouble(rng)) match {
+      case ((v1, next), (v2, next2)) => {
+        assert(v1 == v2)
+        assert(next == next2)
+      }
+    }
+  }
+
+  test("exercise 6.7 sequence") {
     def ints(count: Int)(rng: RNG): (List[Int], RNG) = RNG.sequence2(List.fill(count)(RNG.int)).apply(rng)
 
     val r1 = ints(10)(SimpleRNG(10))
@@ -112,6 +126,48 @@ class StateTest extends FunSuite {
     assert(r1 == r2)
     println(r1._1)
     println(r2._1)
+  }
+
+  test("exercise 6.8 flatMap") {
+    Stream.ones.take(100).foldRight(SimpleRNG(10): RNG) { (_, rng) =>
+      RNG.nonNegativeLessThanWithFlatMap(10)(rng) match {
+        case (i, nextRNG) => {
+          assert(i < 10)
+          assert(i >= 0)
+          nextRNG
+        }
+      }
+    }
+  }
+
+  test("exercise 6.9 map with flatMap") {
+    //map
+    RNG.mapWithFlatMap(RNG.nonNegativeLessThan(5))(n => "🍣" * n).apply(SimpleRNG(10)) match {
+      case (sushi, _) => {
+        assert(sushi === "🍣" * sushi.codePointCount(0, sushi.length))
+      }
+    }
+
+    //map2
+    def both[A, B](ra: Rand[A], rb: Rand[B]): Rand[(A, B)] = RNG.map2WithFlatMap(ra, rb)((_, _))
+
+    val rng = SimpleRNG(10)
+    (both(RNG.int, RNG.double)(rng), both(RNG.int, RNG.double)(rng)) match {
+      case ((v1, next), (v2, next2)) => {
+        assert(v1 == v2)
+        assert(next == next2)
+      }
+    }
+  }
+
+  test("rollDie") {
+    def rollDie: Rand[Int] = RNG.nonNegativeLessThanWithFlatMap(6)
+
+    def improvedRollDie: Rand[Int] = RNG.map(RNG.nonNegativeLessThanWithFlatMap(6))(_ + 1)
+
+    val seedsToZero = Stream.from(0).filter(seed => rollDie(SimpleRNG(seed))._1 == 0).take(100)
+    //    println(s"Seed for zero: ${seedsToZero}")
+    seedsToZero.foreach(seed => assert(improvedRollDie(SimpleRNG(seed))._1 != 0))
   }
 
 }

@@ -32,9 +32,15 @@ object RNG {
     case (a, rng2) => (f(a), rng2)
   }
 
+  def mapWithFlatMap[A, B](s: Rand[A])(f: A => B): Rand[B] = flatMap(s) { a => rng => (f(a), rng) }
+
   def map2[A, B, C](ra: Rand[A], rb: Rand[B])(f: (A, B) => C): Rand[C] = rng => (ra(rng), rb(rng)) match {
     case ((a, next), (b, _)) => (f(a, b), next)
   }
+
+  def map2WithFlatMap[A, B, C](ra: Rand[A], rb: Rand[B])(f: (A, B) => C): Rand[C] =
+    flatMap(ra)(a => rng => flatMap(rb)(b => rng2 => (f(a, b), rng2))(rng))
+
 
   def both[A, B](ra: Rand[A], rb: Rand[B]): Rand[(A, B)] = map2(ra, rb)((_, _))
 
@@ -63,6 +69,12 @@ object RNG {
     go(rng, fs, List())
   }
 
+  def flatMap[A, B](f: Rand[A])(g: A => Rand[B]): Rand[B] = rng => f(rng) match {
+    case (a, nextRNG) => g(a)(nextRNG) match {
+      case (b, nextRNG2) => (b, nextRNG2)
+    }
+  }
+
 
   def nonNegativeInt(rng: RNG): (Int, RNG) = rng.nextInt match {
     case (n, r) => {
@@ -74,10 +86,7 @@ object RNG {
   }
 
   def double(rng: RNG): (Double, RNG) = nonNegativeInt(rng) match {
-    case (n, r) => {
-      (n.toDouble / Math.nextUp(Int.MaxValue.toDouble)), r)
-    }
-
+    case (n, r) => (n.toDouble / Math.nextUp(Int.MaxValue.toDouble), r)
   }
 
   def doubleWithMap(rng: RNG): (Double, RNG) = map(nonNegativeInt)(_.toDouble / Int.MaxValue.toDouble).apply(rng)
@@ -108,6 +117,22 @@ object RNG {
 
     loop(count, rng, List())
   }
+
+  def nonNegativeLessThan(n: Int): Rand[Int] = rng => nonNegativeInt(rng) match {
+    case (i, rng2) => {
+      val mod = i % n
+      if (i + (n - 1) - mod >= 0) (mod, rng2)
+      else nonNegativeLessThan(n)(rng)
+    }
+  }
+
+  def nonNegativeLessThanWithFlatMap(n: Int): Rand[Int] = flatMap(nonNegativeInt) { i =>
+    nextRNG =>
+      val mod = i % n
+      if (i + (n - 1) - mod >= 0) (mod, nextRNG)
+      else nonNegativeLessThanWithFlatMap(n)(nextRNG)
+  }
+
 
 }
 
