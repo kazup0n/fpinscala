@@ -6,6 +6,39 @@ trait RNG {
   def nextInt: (Int, RNG)
 }
 
+case class State[S, +A](run: S => (A, S)) {
+
+
+  def flatMap[B](f: A => State.State[S, B]): State.State[S, B] = init => run(init) match {
+    case (a, s) => f(a)(s)
+  }
+
+  def map[B](f: A => B): State.State[S, B] = flatMap { a => State.unit(f(a)) }
+
+
+  def map2[B, C](sb: State[S, B])(f: (A, B) => C): State.State[S, C] =
+    flatMap(a => s1 => sb.flatMap(b => s2 => (f(a, b), s2))(s1))
+}
+
+object State {
+  type State[S, +A] = S => (A, S)
+
+  def unit[S, A](a: A): State[S, A] = s => (a, s)
+
+  def sequence[S, A](fs: List[State[S, A]]): State[S, List[A]] = state => {
+    @tailrec
+    def go[A](state: S, fs: List[State[S, A]], acc: List[A]): (List[A], S) = fs match {
+      case h +: tail => h(state) match {
+        case (n, next) => go(next, tail, n +: acc)
+      }
+      case _ => (acc, state)
+    }
+
+    go(state, fs, List())
+  }
+
+}
+
 
 case class SimpleRNG(seed: Long) extends RNG {
 
@@ -19,6 +52,7 @@ case class SimpleRNG(seed: Long) extends RNG {
 }
 
 object RNG {
+
 
   type Rand[+A] = RNG => (A, RNG)
 
@@ -70,9 +104,7 @@ object RNG {
   }
 
   def flatMap[A, B](f: Rand[A])(g: A => Rand[B]): Rand[B] = rng => f(rng) match {
-    case (a, nextRNG) => g(a)(nextRNG) match {
-      case (b, nextRNG2) => (b, nextRNG2)
-    }
+    case (a, nextRNG) => g(a)(nextRNG)
   }
 
 
@@ -118,6 +150,7 @@ object RNG {
     loop(count, rng, List())
   }
 
+
   def nonNegativeLessThan(n: Int): Rand[Int] = rng => nonNegativeInt(rng) match {
     case (i, rng2) => {
       val mod = i % n
@@ -132,6 +165,17 @@ object RNG {
       if (i + (n - 1) - mod >= 0) (mod, nextRNG)
       else nonNegativeLessThanWithFlatMap(n)(nextRNG)
   }
+
+  //with State
+  def mapByState[A, B](s: Rand[A])(f: A => B): Rand[B] = State(s).map(f)
+
+  def flatMapByState[A, B](f: Rand[A])(g: A => Rand[B]): Rand[B] = State(f).flatMap(g)
+
+  def unitByState[A](a: A): Rand[A] = State.unit(a)
+
+  def sequenceByState[A](fs: List[Rand[A]]): Rand[List[A]] = State.sequence(fs)
+
+  def map2ByState[A, B, C](ra: Rand[A], rb: Rand[B])(f: (A, B) => C): Rand[C] = State(ra).map2(State(rb))(f)
 
 
 }
