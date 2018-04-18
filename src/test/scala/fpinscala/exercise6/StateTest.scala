@@ -172,15 +172,9 @@ class StateTest extends FunSuite {
 
   test("exercise 6.10 flatMapWithState") {
 
-    def nonNegativeLessThanWithFlatMap(n: Int): Rand[Int] = RNG.flatMapByState(RNG.nonNegativeInt) { i =>
-      nextRNG =>
-        val mod = i % n
-        if (i + (n - 1) - mod >= 0) (mod, nextRNG)
-        else nonNegativeLessThanWithFlatMap(n)(nextRNG)
-    }
 
     Stream.ones.take(100).foldRight(SimpleRNG(10): RNG) { (_, rng) =>
-      nonNegativeLessThanWithFlatMap(10)(rng) match {
+      RNG.nonNegativeLessThanWithFlatMap(10)(rng) match {
         case (i, nextRNG) => {
           assert(i < 10)
           assert(i >= 0)
@@ -191,33 +185,28 @@ class StateTest extends FunSuite {
   }
 
   test("exercise 6.10 sequenceByState") {
-    def ints(count: Int)(rng: RNG): (List[Int], RNG) = RNG.sequenceByState(List.fill(count)(RNG.int)).apply(rng)
+    def ints(count: Int): RandState.Rand[List[Int]] = RandState.sequence(List.fill(count)(RandState.int))
 
-    val r1 = ints(10)(SimpleRNG(10))
-    val r2 = ints(10)(SimpleRNG(10))
-    assert(r1 == r2)
-    println(r1._1)
-    println(r2._1)
+    val r1 = ints(10).run(SimpleRNG(10))
+    val r2 = ints(10).run(SimpleRNG(10))
+    assert(r1._1 == r2._1)
   }
 
   test("exercise 6.10 mapByState, map2ByState") {
     //map
-    RNG.mapByState(RNG.nonNegativeLessThan(5))(n => "🍣" * n).apply(SimpleRNG(10)) match {
-      case (sushi, _) => {
-        assert(sushi === "🍣" * sushi.codePointCount(0, sushi.length))
+    RandState.map(RandState.nonNegativeInt)("-" * _).run(SimpleRNG(10)) match {
+      case (a,_) => {
+        print(a)
       }
     }
 
     //map2
-    def both[A, B](ra: Rand[A], rb: Rand[B]): Rand[(A, B)] = RNG.map2ByState(ra, rb)((_, _))
+    def both[A, B](ra: RandState.Rand[A], rb: RandState.Rand[B]) = RandState.map2(ra, rb)((a,b) => (a,b))
 
     val rng = SimpleRNG(10)
-    (both(RNG.int, RNG.double)(rng), both(RNG.int, RNG.double)(rng)) match {
-      case ((v1, next), (v2, next2)) => {
-        assert(v1 == v2)
-        assert(next == next2)
-      }
-    }
+    val (a, b) = both(RandState.nonNegativeInt, RandState.int).run(rng)
+    print(a)
+    print(b)
   }
 
 }
