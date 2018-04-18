@@ -29,7 +29,8 @@ class Exercise2_2 extends FunSuite {
   }
 
   test("unsorted strings") {
-    assert(isSorted(Random.shuffle(Seq("a", "b", "c", "d")).toArray, sortString) == false)
+    val original = Array("b", "a", "d", "c")
+    assert(isSorted(original, sortString) == false)
   }
 
 }
