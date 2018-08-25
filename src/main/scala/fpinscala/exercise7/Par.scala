@@ -1,6 +1,6 @@
 package fpinscala.exercise7
 
-import java.util.concurrent.TimeUnit
+import java.util.concurrent._
 
 import scala.concurrent.duration.TimeUnit
 
@@ -98,10 +98,6 @@ object Par {
 
   def equal[A](e: ExecutorService)(p: Par[A], p2:Par[A]): Boolean = p(e).get == p2(e).get
 
-
-
-
-
   def run[A](s: ExecutorService)(a: Par[A]): Future[A] = a(s)
 
   // exercise 7.3
@@ -124,7 +120,7 @@ object Par {
 
     override def isDone: Boolean = a.isDone && b.isDone
 
-    override def isCanceled: Boolean = a.isCanceled || b.isCanceled
+    override def isCancelled: Boolean = a.isCancelled || b.isCancelled
   }
 
   private case class UnitFuture[A](get: A) extends Future[A] {
@@ -135,29 +131,6 @@ object Par {
 
     override def isDone: Boolean = true
 
-    override def isCanceled: Boolean = false
+    override def isCancelled: Boolean = false
   }
-
-}
-
-
-abstract class ExecutorService {
-  def submit[A](a: Callable[A]): Future[A]
-}
-
-trait Callable[A] {
-  def call: A
-}
-
-trait Future[A] {
-  def get: A
-
-  def get(timeout: Long, unit: TimeUnit): A
-
-  def cancel(evenIfRunning: Boolean): Boolean
-
-  def isDone: Boolean
-
-  def isCanceled: Boolean
-
 }
