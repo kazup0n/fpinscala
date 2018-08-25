@@ -19,6 +19,8 @@ object Par {
     override def call: A = a(es).get
   })
 
+  def delay[A](fa: => Par[A]):Par[A] = es => fa(es)
+
 
   // exercise 7.1
   def map2[A, B, C](a: Par[A], b: Par[B])(f: (A, B) => C): Par[C] =
