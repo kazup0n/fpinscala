@@ -63,9 +63,21 @@ object Par {
     if(f(a)) List(a) else List.empty
   })(_.flatten)
 
+  def sum(ints: IndexedSeq[Int]): Par[Int] =
+    if(ints.length <= 1)
+      Par.unit(ints.headOption getOrElse 0)
+    else {
+      val (l, r) = ints.splitAt(ints.length / 2)
+      Par.map2(Par.fork(sum(l)), Par.fork(sum(r)))(_+_)
+    }
 
-  def sum(ints: IndexedSeq[Int]): Par[Int] = map(parMap(ints.toList)(identity))(_.sum)
-  def max(ints: IndexedSeq[Int]): Par[Int] = map(sortPar(parMap(ints.toList)(identity)))(_.head)
+  def max(ints: IndexedSeq[Int]): Par[Int] = {
+    if(ints.size <= 1) Par.unit(ints.headOption.getOrElse(0))
+    else ints.splitAt(ints.length/2) match {
+      case (l, r) => map2(fork(max(l)), fork(max(r)))((a:Int,b:Int) =>  a max b)
+    }
+  }
+
   def wordCount(paragraphs:List[String]):Par[List[Int]] = parMap(paragraphs)(_.split(" ").length)
   def count[A](items:List[A])(f:A => Int):Par[List[Int]] = parMap(items)(f)
 
