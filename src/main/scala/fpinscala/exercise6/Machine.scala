@@ -9,10 +9,10 @@ case object Turn extends Input
 
 case class Machine(locked: Boolean, candies: Int, coins: Int) {
 
-  def update(input: Input): State[Machine, (Int, Int)] =
-    State((machine:Machine) => {
-      (machine, (0,0))
-    })
+//  def update(input: Input): State[Machine, (Int, Int)] =
+//    State((machine:Machine) => {
+//      (machine, (0,0))
+//    })
 
   /**
     * ロックされた状態の自販機に硬貨を投入すると、スナックが残っている場合はロックが解除される
