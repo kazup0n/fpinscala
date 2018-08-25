@@ -1,32 +1,39 @@
 package fpinscala.exercise7.exercise7_2
 
-import java.util.concurrent.{Callable, ExecutorService, Future}
+import fpinscala.exercise7.{Callable, ExecutorService, Future}
 
-trait Par[A] {}
-
-case class CallablePar[A](callable:Callable[A]) extends Par[A] {
-}
-
-object CallablePar {
-
-  implicit def toPar[A](callable: Callable[A]):Par[A] = CallablePar(callable)
-  implicit def toCallable[A](pa:Par[A]): Callable[A] = pa match {
-    case CallablePar(pa) => pa
-  }
-
-  def unit[A](a:A):Par[A] = new Callable[A] {
-    override def call(): A = a
-  }
-}
-
+import scala.concurrent.duration.TimeUnit
 
 
 object Par {
-  import CallablePar.toCallable
-  def unit[A](a: A):Par[A] = CallablePar.unit(a)
-//  def map2[A, B, C](pa:Par[B], pb:Par[B]):Par[C]
-//  def fork[A](a: => Par[A]): Par[A]
-//  def lazyUnit[A](a: =>A):Par[A] =
-  def run[A](es:ExecutorService)(pa:Par[A]):A = es.submit(pa).get
-//
+
+  type Par[A] = ExecutorService => Future[A]
+
+  def unit[A](a: A): Par[A] = (es:ExecutorService) => UnitFuture(a)
+
+  private case class UnitFuture[A](get: A) extends Future[A] {
+
+    override def get(timeout: Long, unit: TimeUnit): A = get
+
+    override def cancel(evenIfRunning: Boolean): Boolean = false
+
+    override def isDone: Boolean = true
+
+    override def isCanceled: Boolean = false
+  }
+
+
+  def map2[A, B, C](a: Par[A], b: Par[B])(f: (A, B) => C): Par[C] =
+    (es: ExecutorService) => {
+      val af = a(es)
+      val bf = b(es)
+      UnitFuture(f(af.get, bf.get))
+    }
+
+  def fork[A](a: => Par[A]): Par[A] =
+    es => es.submit(new Callable[A] {
+      override def call: A = a(es).get
+    })
+
 }
+

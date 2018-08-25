@@ -96,7 +96,7 @@ object Par {
       f(abcd._1, abcd._2, abcd._3, abcd._4, e)
     }
 
-  def equal[A](e: ExecutorService)(p: Par[A], p2:Par[A]): Boolean = p(e).get == p2(2).get
+  def equal[A](e: ExecutorService)(p: Par[A], p2:Par[A]): Boolean = p(e).get == p2(e).get
 
 
 
